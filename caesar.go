@@ -1,12 +1,19 @@
 package main
 
-func caesar(in input) output {
+const power = 26
 
-	return output{}
+func caesar(in input) output {
+	key := in.Shift
+	if !in.Encode {
+		key *= -1
+	}
+
+	return output{
+		Text: shift(in.Text, key),
+	}
 }
 
 func shift(in string, n int) string {
-	const power = 26
 	out := make([]byte, len(in))
 	for i := 0; i < len(in); i++ {
 		ch := in[i]
