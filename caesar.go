@@ -5,7 +5,7 @@ const power = 26
 func caesar(in input) output {
 	key := in.Shift
 	if !in.Encode {
-		key *= -1
+		key = power - key
 	}
 
 	return output{
