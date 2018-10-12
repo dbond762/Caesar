@@ -4,6 +4,10 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+
+	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/middleware"
+	"github.com/go-chi/cors"
 )
 
 type input struct {
@@ -19,17 +23,11 @@ type output struct {
 }
 
 func index(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		log.Println("Index method not allowed: ", r.Method)
-		http.Error(w, "", http.StatusMethodNotAllowed)
-		return
-	}
-
 	decoder := json.NewDecoder(r.Body)
 	var in input
 	err := decoder.Decode(&in)
 	if err != nil {
-		log.Println("Index json decode error: ", err)
+		log.Println("Index, json decode error: ", err)
 		http.Error(w, "", http.StatusBadRequest)
 		return
 	}
@@ -39,13 +37,30 @@ func index(w http.ResponseWriter, r *http.Request) {
 	encoder := json.NewEncoder(w)
 	err = encoder.Encode(out)
 	if err != nil {
-		log.Println("Index json encode error: ", err)
+		log.Println("Index, json encode error: ", err)
 		http.Error(w, "", http.StatusInternalServerError)
 	}
 }
 
 func main() {
-	http.HandleFunc("/", index)
-	log.Println("Server run on http://localhost:8000")
-	log.Fatal(http.ListenAndServe(":8000", nil))
+	r := chi.NewRouter()
+
+	CORS := cors.New(cors.Options{
+		AllowedOrigins:   []string{"*"},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
+		ExposedHeaders:   []string{"Link"},
+		AllowCredentials: true,
+		MaxAge:           300,
+	})
+	r.Use(CORS.Handler)
+	r.Use(middleware.SetHeader("Content-Type", "application/json"))
+	r.Use(middleware.Logger)
+
+	r.Post("/", index)
+
+	log.Printf("Server run on http://localhost:8000")
+	if err := http.ListenAndServe(":8000", r); err != nil {
+		log.Fatal("ListenAndServe: ", err)
+	}
 }
