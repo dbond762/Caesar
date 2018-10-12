@@ -8,8 +8,31 @@ func caesar(in input) output {
 		key = power - key
 	}
 
+	counts := make([]int, power)
+loop:
+	for i := 0; i < len(in.Text); i++ {
+		ch := in.Text[i]
+		var idx int
+		switch {
+		case byte('a') <= ch && ch <= byte('z'):
+			idx = int(ch) - 'a'
+		case byte('A') <= ch && ch <= byte('Z'):
+			idx = int(ch) - 'A'
+		default:
+			continue loop
+		}
+		counts[idx]++
+	}
+
+	freqs := make([]float64, power)
+	total := float64(len(in.Text))
+	for i, num := range counts {
+		freqs[i] = float64(num) / total
+	}
+
 	return output{
-		Text: shift(in.Text, key),
+		Text:  shift(in.Text, key),
+		Freqs: freqs,
 	}
 }
 
