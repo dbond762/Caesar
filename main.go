@@ -17,9 +17,10 @@ type input struct {
 }
 
 type output struct {
-	Text  string         `json:"text"`
-	Shift int            `json:"shift"`
-	Freqs [power]float64 `json:"freqs"`
+	Text       string         `json:"text"`
+	Shift      int            `json:"shift"`
+	Freqs      [power]float64 `json:"freqs"`
+	IsAnalyzed bool           `json:"isAnalyzed"`
 }
 
 func index(w http.ResponseWriter, r *http.Request) {

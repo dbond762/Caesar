@@ -1,6 +1,9 @@
 package main
 
-const power = 26
+const (
+	power           = 26
+	unicityDistance = 28
+)
 
 var freqsTable = [power]float64{
 	0.08167, 0.01492, 0.02782, 0.04253, 0.12702, 0.02228, 0.02015, 0.06094, 0.06966, 0.00153,
@@ -52,13 +55,22 @@ loop:
 
 	if totalLetters == 0 {
 		return output{
-			Text: string(text),
+			Text:       string(text),
+			IsAnalyzed: false,
 		}
 	}
 
 	var freqs [power]float64
 	for i, num := range counts {
 		freqs[i] = float64(num) / float64(totalLetters)
+	}
+
+	if totalLetters < unicityDistance {
+		return output{
+			Text:       string(text),
+			Freqs:      freqs,
+			IsAnalyzed: false,
+		}
 	}
 
 	var (
@@ -74,9 +86,10 @@ loop:
 	}
 
 	return output{
-		Text:  string(text),
-		Freqs: freqs,
-		Shift: shift,
+		Text:       string(text),
+		Freqs:      freqs,
+		Shift:      shift,
+		IsAnalyzed: true,
 	}
 }
 
