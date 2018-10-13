@@ -10,6 +10,11 @@ var freqsTable = [power]float64{
 
 func caesar(in input) output {
 	key := in.Shift
+	key %= power
+	if key < 0 {
+		key *= -1
+	}
+
 	if !in.Encode {
 		key = power - key
 	}
@@ -43,6 +48,12 @@ loop:
 
 		totalLetters++
 		counts[idx]++
+	}
+
+	if totalLetters == 0 {
+		return output{
+			Text: string(text),
+		}
 	}
 
 	var freqs [power]float64
