@@ -9,6 +9,7 @@ func caesar(in input) output {
 	}
 
 	counts := make([]int, power)
+	total := 0
 loop:
 	for i := 0; i < len(in.Text); i++ {
 		ch := in.Text[i]
@@ -21,13 +22,13 @@ loop:
 		default:
 			continue loop
 		}
+		total++
 		counts[idx]++
 	}
 
 	freqs := make([]float64, power)
-	total := float64(len(in.Text))
 	for i, num := range counts {
-		freqs[i] = float64(num) / total
+		freqs[i] = float64(num) / float64(total)
 	}
 
 	return output{
