@@ -1,8 +1,8 @@
 package main
 
 const (
-	power           = 26
-	unicityDistance = 28
+	power           = 26 // Мощность алфавита
+	unicityDistance = 28 // Расстояние единственности
 )
 
 var freqsTable = [power]float64{
@@ -12,10 +12,11 @@ var freqsTable = [power]float64{
 }
 
 func caesar(in input) output {
+	// Переводим ключ в [0; power)
 	key := in.Shift
 	key %= power
 	if key < 0 {
-		key *= -1
+		key = power + key
 	}
 
 	if !in.Encode {
@@ -29,6 +30,7 @@ func caesar(in input) output {
 		totalLetters = 0
 	)
 
+	// В цикле производим сдвиг текста и подсчет символов.
 loop:
 	for i := 0; i < len(in.Text); i++ {
 		var (
@@ -60,6 +62,7 @@ loop:
 		}
 	}
 
+	// Переводим количества символов в их частоты.
 	var freqs [power]float64
 	for i, num := range counts {
 		freqs[i] = float64(num) / float64(totalLetters)
@@ -73,6 +76,9 @@ loop:
 		}
 	}
 
+	// Криптоанализ сообщения.
+	// Для всех возможных значений сдвига выбираем
+	// минимальное значение оценочной функции.
 	var (
 		shift = 0
 		eMin  = estimate(&freqs, shift)
@@ -93,6 +99,8 @@ loop:
 	}
 }
 
+// Оценочная функция. \sum_{i=0}^{power} (E_i - R_i)^2 ,
+// где E - эталонный ряд, R - рассматриваемый ряд.
 func estimate(row *[power]float64, shift int) (e float64) {
 	for i := 0; i < power; i++ {
 		diff := freqsTable[i] - row[(i+shift)%power]
